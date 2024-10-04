@@ -8,93 +8,96 @@ public class List<T> {
     }
 
     // Метод возвращает позицию после последнего элемента
-    public Position END() {
-        int index = 0;
+    public Position<T> END() {
         Node<T> temp = head;
-        while (temp != null) {
-            temp = temp.next;
-            index++;
+        if (temp == null) {
+            return new Position<>(null); // Если список пуст, возвращаем позицию с null
         }
-        return new Position(index); // Возвращаем позицию конца списка
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        return new Position<>(temp); // Возвращаем позицию последнего элемента
     }
 
     // Метод вставки нового элемента в список
-    public void INSERT(T x, Position p) {
+    public void INSERT(T x, Position<T> p) {
         Node<T> newNode = new Node<>(x); // Создаем новый узел
-        if (p.getIndex() == 0) {
+        if (p.getNode() == head) {
             newNode.next = head; // Вставляем в начало списка
             head = newNode;
         } else {
             Node<T> temp = head;
-            for (int i = 0; i < p.getIndex() - 1; i++) {
-                if (temp == null) {
-                    throw new IndexOutOfBoundsException("Invalid position"); // Проверяем на корректную позицию
-                }
+            while (temp != null && temp != p.getNode()) {
                 temp = temp.next;
             }
-            newNode.next = temp.next;
-            temp.next = newNode;
+            if (temp != null) {
+                newNode.next = temp.next;
+                temp.next = newNode;
+            } else {
+                throw new IndexOutOfBoundsException("Invalid position"); // Проверяем корректность позиции
+            }
         }
     }
 
     // Метод поиска элемента в списке
-    public Position LOCATE(T x) {
+    public Position<T> LOCATE(T x) {
         Node<T> temp = head;
-        int index = 0;
         while (temp != null) {
             if (temp.data.equals(x)) {
-                return new Position(index); // Возвращаем позицию, если нашли элемент
+                return new Position<>(temp); // Возвращаем позицию найденного элемента
             }
             temp = temp.next;
-            index++;
         }
-        return END(); // Если элемент не найден, возвращаем конец списка
+        return new Position<>(null); // Если элемент не найден, возвращаем позицию с null
     }
 
     // Метод получения элемента по позиции
-    public T RETRIEVE(Position p) {
-        Node<T> temp = head;
-        int index = 0;
-        while (temp != null && index < p.getIndex()) {
-            temp = temp.next;
-            index++;
-        }
-        if (temp != null) {
-            return temp.data;
-        } else {
+    public T RETRIEVE(Position<T> p) {
+        if (p.getNode() == null) {
             throw new IndexOutOfBoundsException("Invalid position");
         }
+        return p.getNode().data;
     }
 
     // Метод удаления элемента по позиции
-    public void DELETE(Position p) {
-        if (p.getIndex() == 0) {
-            if (head != null) {
-                head = head.next; // Удаляем первый элемент
-            }
+    public void DELETE(Position<T> p) {
+        if (head == null || p.getNode() == null) {
+            throw new IndexOutOfBoundsException("Invalid position");
+        }
+
+        if (p.getNode() == head) {
+            head = head.next; // Удаляем первый элемент
         } else {
             Node<T> temp = head;
-            for (int i = 0; i < p.getIndex() - 1; i++) {
-                if (temp == null || temp.next == null) {
-                    throw new IndexOutOfBoundsException("Invalid position"); // Проверяем позицию на корректность
-                }
+            while (temp != null && temp.next != p.getNode()) {
                 temp = temp.next;
             }
-            temp.next = temp.next != null ? temp.next.next : null; // Удаляем элемент
+            if (temp != null && temp.next == p.getNode()) {
+                temp.next = p.getNode().next; // Удаляем элемент
+            } else {
+                throw new IndexOutOfBoundsException("Invalid position");
+            }
         }
     }
 
     // Метод возвращает позицию следующего элемента
-    public Position NEXT(Position p) {
-        return new Position(p.getIndex() + 1); // Возвращаем позицию следующего элемента
+    public Position<T> NEXT(Position<T> p) {
+        if (p.getNode() == null || p.getNode().next == null) {
+            return new Position<>(null); // Нет следующего элемента
+        }
+        return new Position<>(p.getNode().next);
     }
 
     // Метод возвращает позицию предыдущего элемента
-    public Position PREVIOUS(Position p) {
-        if (p.getIndex() <= 0) {
-            throw new IndexOutOfBoundsException("Invalid position");
+    public Position<T> PREVIOUS(Position<T> p) {
+        if (p.getNode() == head) {
+            return new Position<>(null); // Если это первый элемент, предыдущего нет
         }
-        return new Position(p.getIndex() - 1); // Возвращаем позицию предыдущего элемента
+        Node<T> temp = head;
+        while (temp != null && temp.next != p.getNode()) {
+            temp = temp.next;
+        }
+        return new Position<>(temp); // Возвращаем предыдущий узел
     }
 
     // Метод очищает список
@@ -103,8 +106,8 @@ public class List<T> {
     }
 
     // Метод возвращает первую позицию в списке
-    public Position FIRST() {
-        return new Position(0); // Возвращаем первую позицию
+    public Position<T> FIRST() {
+        return new Position<>(head); // Возвращаем первую позицию
     }
 
     // Метод выводит все элементы списка

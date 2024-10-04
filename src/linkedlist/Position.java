@@ -1,22 +1,25 @@
 package linkedlist;
 
-public class Position {
-    private int index;  // Храним индекс позиции в списке
+public class Position<T> {
+    private Node<T> node; // Хранение ссылки на узел списка
 
-    public Position(int index) {
-        this.index = index;
+    // Конструктор с передачей узла
+    public Position(Node<T> node) {
+        this.node = node;
     }
 
-    public int getIndex() {
-        return index;
+    // Получение узла
+    public Node<T> getNode() {
+        return node;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    // Установка нового узла
+    public void setNode(Node<T> node) {
+        this.node = node;
     }
 
     @Override
     public String toString() {
-        return Integer.toString(index);
+        return node != null ? node.toString() : "null";
     }
 }
