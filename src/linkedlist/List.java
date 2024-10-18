@@ -1,122 +1,118 @@
 package linkedlist;
 
-public class List<T> {
-    private Node<T> head; // Указатель на начало списка
+public class List {
+    private ListElement head; // Указатель на первый элемент списка
 
+    // Конструктор, инициализирующий пустой список
     public List() {
-        head = null; // Инициализация пустого списка
+        head = null;
     }
 
-    // Метод возвращает позицию после последнего элемента
-    public Position<T> END() {
-        Node<T> temp = head;
-        if (temp == null) {
-            return new Position<>(null); // Если список пуст, возвращаем позицию с null
+    // Метод для получения позиции конца списка
+    public Position END() {
+        ListElement current = head;
+        while (current != null && current.getNext() != null) {
+            current = current.getNext();
         }
-        while (temp.next != null) {
-            temp = temp.next;
-        }
-        return new Position<>(temp); // Возвращаем позицию последнего элемента
+        return new Position(null); // END указывает на null
     }
 
-    // Метод вставки нового элемента в список
-    public void INSERT(T x, Position<T> p) {
-        Node<T> newNode = new Node<>(x); // Создаем новый узел
-        if (p.getNode() == head) {
-            newNode.next = head; // Вставляем в начало списка
-            head = newNode;
-        } else {
-            Node<T> temp = head;
-            while (temp != null && temp != p.getNode()) {
-                temp = temp.next;
-            }
-            if (temp != null) {
-                newNode.next = temp.next;
-                temp.next = newNode;
+    // Метод для вставки элемента в список на указанную позицию
+    public void INSERT(ListElement element, Position position) {
+        ListElement newElement = new ListElement(element); // Создаем копию элемента
+
+        if (position.getElement() == null) {
+            // Вставляем в конец списка, если позиция равна END
+            if (head == null) {
+                head = newElement; // Если список пуст, вставляем в начало
             } else {
-                throw new IndexOutOfBoundsException("Invalid position"); // Проверяем корректность позиции
+                ListElement current = head;
+                while (current.getNext() != null) {
+                    current = current.getNext();
+                }
+                current.setNext(newElement);
             }
-        }
-    }
-
-    // Метод поиска элемента в списке
-    public Position<T> LOCATE(T x) {
-        Node<T> temp = head;
-        while (temp != null) {
-            if (temp.data.equals(x)) {
-                return new Position<>(temp); // Возвращаем позицию найденного элемента
-            }
-            temp = temp.next;
-        }
-        return new Position<>(null); // Если элемент не найден, возвращаем позицию с null
-    }
-
-    // Метод получения элемента по позиции
-    public T RETRIEVE(Position<T> p) {
-        if (p.getNode() == null) {
-            throw new IndexOutOfBoundsException("Invalid position");
-        }
-        return p.getNode().data;
-    }
-
-    // Метод удаления элемента по позиции
-    public void DELETE(Position<T> p) {
-        if (head == null || p.getNode() == null) {
-            throw new IndexOutOfBoundsException("Invalid position");
-        }
-
-        if (p.getNode() == head) {
-            head = head.next; // Удаляем первый элемент
+        } else if (position.getElement() == head) {
+            // Если позиция указывает на первый элемент, вставляем перед ним
+            newElement.setNext(head);
+            head = newElement;
         } else {
-            Node<T> temp = head;
-            while (temp != null && temp.next != p.getNode()) {
-                temp = temp.next;
+            // Вставляем новый элемент после текущего
+            newElement.setNext(position.getElement().getNext());
+            position.getElement().setNext(newElement);
+        }
+    }
+
+    // Метод для поиска элемента по имени
+    public Position LOCATE(String name) {
+        ListElement current = head;
+        while (current != null) {
+            if (current.getName().equals(name)) {
+                return new Position(current); // Возвращаем позицию найденного элемента
             }
-            if (temp != null && temp.next == p.getNode()) {
-                temp.next = p.getNode().next; // Удаляем элемент
-            } else {
-                throw new IndexOutOfBoundsException("Invalid position");
+            current = current.getNext();
+        }
+        return END(); // Если элемент не найден, возвращаем END
+    }
+
+    // Метод для получения элемента на указанной позиции
+    public ListElement RETRIEVE(Position position) {
+        ListElement element = position.getElement(); // Элемент на указанной позиции
+        if (element == null) throw new IllegalArgumentException("Invalid position.");
+        return element; // Возвращаем элемент списка
+    }
+
+    // Метод для удаления элемента на указанной позиции
+    public void DELETE(Position position) {
+        ListElement posElement = position.getElement(); // Элемент, который нужно удалить
+        if (posElement == null || head == null) return;
+        if (posElement == head) {
+            head = head.getNext(); // Удаляем первый элемент
+        } else {
+            ListElement current = head;
+            while (current.getNext() != posElement && current.getNext() != null) {
+                current = current.getNext();
+            }
+            if (current.getNext() == posElement) {
+                current.setNext(posElement.getNext()); // Удаляем элемент
             }
         }
     }
 
-    // Метод возвращает позицию следующего элемента
-    public Position<T> NEXT(Position<T> p) {
-        if (p.getNode() == null || p.getNode().next == null) {
-            return new Position<>(null); // Нет следующего элемента
-        }
-        return new Position<>(p.getNode().next);
+    // Метод для получения следующей позиции
+    public Position NEXT(Position position) {
+        ListElement posElement = position.getElement(); // Текущий элемент
+        if (posElement == null || posElement.getNext() == null) throw new IllegalArgumentException("Invalid position.");
+        return new Position(posElement.getNext()); // Возвращаем следующую позицию
     }
 
-    // Метод возвращает позицию предыдущего элемента
-    public Position<T> PREVIOUS(Position<T> p) {
-        if (p.getNode() == head) {
-            return new Position<>(null); // Если это первый элемент, предыдущего нет
+    // Метод для получения предыдущей позиции
+    public Position PREVIOUS(Position position) {
+        ListElement posElement = position.getElement(); // Текущий элемент
+        if (posElement == null || posElement == head) throw new IllegalArgumentException("Invalid position.");
+        ListElement current = head;
+        while (current != null && current.getNext() != posElement) {
+            current = current.getNext();
         }
-        Node<T> temp = head;
-        while (temp != null && temp.next != p.getNode()) {
-            temp = temp.next;
-        }
-        return new Position<>(temp); // Возвращаем предыдущий узел
+        return new Position(current); // Возвращаем предыдущую позицию
     }
 
-    // Метод очищает список
+    // Метод для очистки списка
     public void MAKENULL() {
-        head = null; // Очищаем список
+        head = null; // Обнуляем список
     }
 
-    // Метод возвращает первую позицию в списке
-    public Position<T> FIRST() {
-        return new Position<>(head); // Возвращаем первую позицию
+    // Метод для получения первой позиции
+    public Position FIRST() {
+        return head == null ? END() : new Position(head); // Возвращаем первую позицию или END
     }
 
-    // Метод выводит все элементы списка
+    // Метод для вывода всех элементов списка
     public void PRINTLIST() {
-        Node<T> temp = head;
-        while (temp != null) {
-            System.out.print(temp.data + " ");
-            temp = temp.next;
+        ListElement current = head;
+        while (current != null) {
+            System.out.println(current); // Печать каждого элемента
+            current = current.getNext();
         }
-        System.out.println();
     }
 }
