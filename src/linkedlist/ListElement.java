@@ -1,47 +1,62 @@
 package linkedlist;
 
+/**
+ * Класс, представляющий элемент списка.
+ * Каждый элемент содержит имя и адрес, которые хранятся в массивах символов с ограничением по длине.
+ * Имя обрезается до 20 символов, а адрес — до 50 символов.
+ */
 public class ListElement {
     private char[] name;    // Имя (максимум 20 символов)
     private char[] address; // Адрес (максимум 50 символов)
-    public ListElement next; // Ссылка на следующий элемент
 
-    // Обычный конструктор
+    /**
+     * Конструктор для создания объекта ListElement.
+     * @param name Имя, которое будет обрезано до 20 символов, если оно длиннее.
+     * @param address Адрес, который будет обрезан до 50 символов, если он длиннее.
+     */
     public ListElement(String name, String address) {
         this.name = new char[20];
         this.address = new char[50];
 
-        // Копируем строку в массив символов, ограничивая по длине
-        System.arraycopy(name.toCharArray(), 0, this.name, 0, Math.min(name.length(), 20));
-        System.arraycopy(address.toCharArray(), 0, this.address, 0, Math.min(address.length(), 50));
-
-        this.next = null; // Изначально следующий элемент отсутствует
+        copyToArray(name, this.name);
+        copyToArray(address, this.address);
     }
 
-    // Копирующий конструктор
-    public ListElement(ListElement other) {
-        this.name = new char[20];
-        this.address = new char[50];
-
-        // Копируем массивы символов
-        System.arraycopy(other.name, 0, this.name, 0, 20);
-        System.arraycopy(other.address, 0, this.address, 0, 50);
-
-        this.next = null; // При копировании создается независимый элемент без ссылки на следующий
+    /**
+     * Метод для копирования строки в массив символов с ограничением по длине.
+     * @param source Строка для копирования.
+     * @param result Массив символов, в который копируется строка.
+     */
+    private void copyToArray(String source, char[] result) {
+        int length = Math.min(source.length(), result.length);
+        for (int i = 0; i < length; i++) {
+            result[i] = source.charAt(i);
+        }
     }
 
-    // Получить имя
+    /**
+     * Метод для получения имени.
+     * @return Строка, представляющая имя, обрезанное до 20 символов.
+     */
     public String getName() {
         return new String(name).trim();
     }
 
-    // Получить адрес
+    /**
+     * Метод для получения адреса.
+     * @return Строка, представляющая адрес, обрезанный до 50 символов.
+     */
     public String getAddress() {
         return new String(address).trim();
     }
 
-    // Переопределение метода toString для вывода
+    /**
+     * Переопределение метода toString для вывода информации об объекте.
+     * @return Строка, представляющая объект ListElement в виде "Name: <имя>, Address: <адрес>".
+     */
     @Override
     public String toString() {
         return "Name: " + getName() + ", Address: " + getAddress();
     }
 }
+

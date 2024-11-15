@@ -1,118 +1,148 @@
 package linkedlist;
 
+/**
+ * Класс, реализующий связный список.
+ * Содержит методы для добавления, удаления элементов и навигации по списку.
+ */
 public class List {
-    private ListElement head; // Указатель на первый элемент списка
+    private Node head; // Указатель на первый узел списка
 
-    // Конструктор, инициализирующий пустой список
+    /**
+     * Конструктор, инициализирующий пустой список.
+     */
     public List() {
         head = null;
     }
 
-    // Метод для получения позиции конца списка
+    /**
+     * Метод для получения позиции конца списка.
+     * @return Позиция, указывающая на конец списка (null).
+     */
     public Position END() {
-        ListElement current = head;
-        while (current != null && current.getNext() != null) {
-            current = current.getNext();
-        }
-        return new Position(null); // END указывает на null
+        return new Position(null);
     }
 
-    // Метод для вставки элемента в список на указанную позицию
+    /**
+     * Метод для вставки элемента в список на указанной позиции.
+     * Если позиция указана как конец списка (END), элемент добавляется в конец.
+     * Вставка перед указанной позицией в остальных случаях.
+     * @param element Элемент, который нужно вставить.
+     * @param position Позиция, на которую нужно вставить элемент.
+     */
     public void INSERT(ListElement element, Position position) {
-        ListElement newElement = new ListElement(element); // Создаем копию элемента
+        Node newNode = new Node(element); // Создаем новый узел с данными
 
         if (position.getElement() == null) {
-            // Вставляем в конец списка, если позиция равна END
+            // Если позиция - конец списка (END), вставляем в конец списка
             if (head == null) {
-                head = newElement; // Если список пуст, вставляем в начало
+                head = newNode; // Если список пуст, вставляем в начало
             } else {
-                ListElement current = head;
-                while (current.getNext() != null) {
-                    current = current.getNext();
+                Node current = head;
+                while (current.next != null) {
+                    current = current.next;
                 }
-                current.setNext(newElement);
+                current.next = newNode; // Добавляем новый узел в конец
             }
-        } else if (position.getElement() == head) {
-            // Если позиция указывает на первый элемент, вставляем перед ним
-            newElement.setNext(head);
-            head = newElement;
         } else {
-            // Вставляем новый элемент после текущего
-            newElement.setNext(position.getElement().getNext());
-            position.getElement().setNext(newElement);
+            // Вставляем новый узел перед текущим узлом позиции
+            Node current = head;
+            while (current != null && current.next != position.getElement()) {
+                current = current.next;
+            }
+            if (current != null) {
+                newNode.next = current.next; // Новый узел указывает на следующий
+                current.next = newNode; // Предыдущий узел указывает на новый узел
+            }
         }
     }
 
-    // Метод для поиска элемента по имени
+    /**
+     * Метод для поиска элемента в списке по имени.
+     * Если элемент найден, возвращает его позицию.
+     * Если элемент не найден, возвращает позицию, указывающую на конец списка.
+     * @param name Имя элемента, который нужно найти.
+     * @return Позиция найденного элемента или END, если элемент не найден.
+     */
     public Position LOCATE(String name) {
-        ListElement current = head;
+        Node current = head;
         while (current != null) {
-            if (current.getName().equals(name)) {
+            if (current.data.getName().equals(name)) {
                 return new Position(current); // Возвращаем позицию найденного элемента
             }
-            current = current.getNext();
+            current = current.next;
         }
         return END(); // Если элемент не найден, возвращаем END
     }
 
-    // Метод для получения элемента на указанной позиции
+    /**
+     * Метод для получения элемента на указанной позиции.
+     * @param position Позиция, на которой нужно извлечь элемент.
+     * @return Элемент на указанной позиции.
+     * @throws IllegalArgumentException Если позиция недействительна (null).
+     */
     public ListElement RETRIEVE(Position position) {
-        ListElement element = position.getElement(); // Элемент на указанной позиции
-        if (element == null) throw new IllegalArgumentException("Invalid position.");
-        return element; // Возвращаем элемент списка
+        Node node = position.getElement(); // Узел на указанной позиции
+        if (node == null) throw new IllegalArgumentException("Invalid position.");
+        return node.data; // Возвращаем элемент списка
     }
 
-    // Метод для удаления элемента на указанной позиции
+    /**
+     * Метод для удаления элемента на указанной позиции.
+     * Если элемент не существует или список пуст, ничего не происходит.
+     * @param position Позиция элемента, который нужно удалить.
+     */
     public void DELETE(Position position) {
-        ListElement posElement = position.getElement(); // Элемент, который нужно удалить
-        if (posElement == null || head == null) return;
-        if (posElement == head) {
-            head = head.getNext(); // Удаляем первый элемент
+        Node nodeToDelete = position.getElement(); // Узел, который нужно удалить
+
+        if (nodeToDelete == null || head == null) return; // Если узел или список пуст, ничего не делаем
+
+        if (nodeToDelete == head) {
+            head = head.next; // Удаляем первый узел
         } else {
-            ListElement current = head;
-            while (current.getNext() != posElement && current.getNext() != null) {
-                current = current.getNext();
+            Node current = head;
+            // Ищем узел перед тем, который нужно удалить
+            while (current.next != null && current.next != nodeToDelete) {
+                current = current.next; // Идём по списку
             }
-            if (current.getNext() == posElement) {
-                current.setNext(posElement.getNext()); // Удаляем элемент
+            // Если нашли узел перед удаляемым
+            if (current.next == nodeToDelete) {
+                current.next = nodeToDelete.next; // Сдвигаем ссылку на следующий узел
             }
         }
     }
 
-    // Метод для получения следующей позиции
+
+    /**
+     * Метод для получения следующей позиции относительно текущей.
+     * @param position Позиция, для которой нужно найти следующую.
+     * @return Позиция следующего узла.
+     * @throws IllegalArgumentException Если позиция недействительна или это последний узел.
+     */
     public Position NEXT(Position position) {
-        ListElement posElement = position.getElement(); // Текущий элемент
-        if (posElement == null || posElement.getNext() == null) throw new IllegalArgumentException("Invalid position.");
-        return new Position(posElement.getNext()); // Возвращаем следующую позицию
+        Node node = position.getElement(); // Текущий узел
+        if (node == null || node.next == null) throw new IllegalArgumentException("Invalid position.");
+        return new Position(node.next); // Возвращаем следующую позицию
     }
 
-    // Метод для получения предыдущей позиции
-    public Position PREVIOUS(Position position) {
-        ListElement posElement = position.getElement(); // Текущий элемент
-        if (posElement == null || posElement == head) throw new IllegalArgumentException("Invalid position.");
-        ListElement current = head;
-        while (current != null && current.getNext() != posElement) {
-            current = current.getNext();
-        }
-        return new Position(current); // Возвращаем предыдущую позицию
-    }
-
-    // Метод для очистки списка
-    public void MAKENULL() {
-        head = null; // Обнуляем список
-    }
-
-    // Метод для получения первой позиции
+    /**
+     * Метод для получения первой позиции в списке.
+     * Если список пуст, возвращается позиция, указывающая на конец списка.
+     * @return Первая позиция списка или END, если список пуст.
+     */
     public Position FIRST() {
-        return head == null ? END() : new Position(head); // Возвращаем первую позицию или END
+        return head == null ? END() : new Position(head);
     }
 
-    // Метод для вывода всех элементов списка
+    /**
+     * Метод для вывода всех элементов списка на экран.
+     * Печатает каждый элемент списка в порядке от головы до конца.
+     */
     public void PRINTLIST() {
-        ListElement current = head;
+        Node current = head;
         while (current != null) {
-            System.out.println(current); // Печать каждого элемента
-            current = current.getNext();
+            System.out.println(current.data);
+            current = current.next;
         }
     }
 }
+
