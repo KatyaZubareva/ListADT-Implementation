@@ -5,7 +5,7 @@ package arraylist;
  * Позиция хранит индекс, который указывает на местоположение элемента в массиве.
  */
 public class Position {
-    private int index;
+    public int index;
 
     /**
      * Конструктор, инициализирующий позицию индексом.
@@ -15,19 +15,10 @@ public class Position {
         this.index = index;
     }
 
-    /**
-     * Метод для получения индекса позиции.
-     * @return Индекс позиции.
-     */
-    public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Метод для установки нового индекса позиции.
-     * @param index Новый индекс, который будет присвоен позиции.
-     */
-    public void setIndex(int index) {
-        this.index = index;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Position position = (Position) object;
+        return (this.index == position.index);
     }
 }

@@ -11,9 +11,9 @@ public class List {
 
     /**
      * Конструктор для создания пустого списка с заданной емкостью.
-     * @param capacity Емкость списка, то есть максимальное количество элементов, которое может содержать список.
      */
-    public List(int capacity) {
+    public List() {
+        int capacity = 20;
         elements = new ListElement[capacity]; // Инициализация массива с заданной емкостью
         last = -1; // Индекс последнего занятого элемента (начинается с -1 для пустого списка)
     }
@@ -22,7 +22,7 @@ public class List {
      * Метод для получения позиции конца списка.
      * @return Позиция, указывающая на место после последнего элемента списка.
      */
-    public Position END() {
+    public Position end() {
         return new Position(last + 1);
     }
 
@@ -32,54 +32,33 @@ public class List {
      * @param position Позиция типа Position, указывающая место, куда нужно вставить элемент.
      * @throws IllegalArgumentException Если позиция недопустима.
      */
-    public void INSERT(ListElement element, Position position) {
-        int posIndex = position.getIndex();
-
-        if (posIndex < 0 || posIndex > last + 1) {
-            throw new IllegalArgumentException("Invalid position.");
-        }
-
-        // Проверка, если массив заполнен, увеличиваем его размер
-        if (last + 1 >= elements.length) {
-            expandArray();
+    public void insert(ListElement element, Position position) {
+        if (position.index < 0 || position.index > last + 1 || last >= elements.length) {
+            return;
         }
 
         // Сдвигаем элементы вправо от позиции вставки
-        for (int i = last; i >= posIndex; i--) {
+        for (int i = last; i >= position.index; i--) {
             elements[i + 1] = elements[i];
         }
 
         // Вставляем элемент
-        elements[posIndex] = element;
+        elements[position.index] = element;
         last++;
     }
-
-    /**
-     * Метод для увеличения размера массива.
-     * Создает новый массив с удвоенной емкостью и копирует в него все элементы старого массива.
-     */
-    private void expandArray() {
-        ListElement[] newElements = new ListElement[elements.length * 2];
-
-        for (int i = 0; i < elements.length; i++) {
-            newElements[i] = elements[i];
-        }
-        elements = newElements;
-    }
-
 
     /**
      * Метод для поиска элемента по имени.
      * @param name Имя элемента, который нужно найти в списке.
      * @return Позиция типа Position, указывающая на найденный элемент, или END, если элемент не найден.
      */
-    public Position LOCATE(String name) {
+    public Position locate(String name) {
         for (int i = 0; i <= last; i++) {
             if (elements[i].getName().equals(name)) {
                 return new Position(i);
             }
         }
-        return END();
+        return new Position(last + 1);
     }
 
     /**
@@ -88,34 +67,29 @@ public class List {
      * @return Элемент типа ListElement, находящийся на указанной позиции.
      * @throws IllegalArgumentException Если позиция недопустима.
      */
-    public ListElement RETRIEVE(Position position) {
-        int index = position.getIndex();
-        if (index < 0 || index > last) {
-            if (index == last + 1) {
-                return null;
-            }
+    public ListElement retrieve(Position position) {
+        if (position.index < 0 || position.index > last) {
             throw new IllegalArgumentException("Invalid position.");
         }
-        return elements[index];
+        return elements[position.index];
     }
+
 
     /**
      * Метод для удаления элемента на указанной позиции.
      * @param position Позиция типа Position, указывающая на место элемента, который нужно удалить.
      * @throws IllegalArgumentException Если позиция недопустима.
      */
-    public void DELETE(Position position) {
-        int index = position.getIndex();
-        if (index < 0 || index > last) {
-            throw new IllegalArgumentException("Invalid position.");
+    public void delete(Position position) {
+        if (position.index < 0 || position.index > last) {
+            return;
         }
 
         // Сдвигаем элементы влево
-        for (int i = index; i < last; i++) {
+        for (int i = position.index; i < last; i++) {
             elements[i] = elements[i + 1];
         }
 
-        elements[last] = null; // Освобождаем последний элемент
         last--; // Уменьшаем индекс последнего элемента
     }
 
@@ -125,12 +99,15 @@ public class List {
      * @return Позиция типа Position, указывающая на следующий элемент, или END, если текущий элемент последний.
      * @throws IllegalArgumentException Если позиция недопустима.
      */
-    public Position NEXT(Position position) {
-        int index = position.getIndex();
-        if (index < 0 || index > last) {
+    public Position next(Position position) {
+        if (position.index < 0 || position.index > last) {
             throw new IllegalArgumentException("Invalid position.");
         }
-        return index == last ? END() : new Position(index + 1);
+        // Если текущая позиция равна последней плюс 1 (END), возвращаем END
+        if (position.index == last) {
+            return new Position(last + 1);
+        }
+        return new Position(position.index + 1);
     }
 
     /**
@@ -139,36 +116,35 @@ public class List {
      * @return Позиция типа Position, указывающая на предыдущий элемент.
      * @throws IllegalArgumentException Если позиция недопустима.
      */
-    public Position PREVIOUS(Position position) {
-        int index = position.getIndex();
-        if (index <= 0 || index > last) {
+    public Position previous(Position position) {
+        if (position.index <= 0 || position.index > last) {
             throw new IllegalArgumentException("Invalid position.");
         }
-        return new Position(index - 1);
+        return new Position(position.index - 1);
     }
 
     /**
      * Метод для очистки списка.
      * Очищает список, создавая новый пустой массив и сбрасывая индекс последнего элемента.
      */
-    public void MAKENULL() {
-        elements = new ListElement[elements.length];
+    public Position makeNull() {
         last = -1;
+        return new Position(last + 1);
     }
 
     /**
      * Метод для получения первой позиции.
      * @return Первая позиция в списке, или END, если список пуст.
      */
-    public Position FIRST() {
-        return last == -1 ? END() : new Position(0);
+    public Position first() {
+        return new Position(0);
     }
 
     /**
      * Метод для вывода списка на печать.
      * Проходит по всем элементам списка и выводит их на экран.
      */
-    public void PRINTLIST() {
+    public void printList() {
         for (int i = 0; i <= last; i++) {
             System.out.println(elements[i]);
         }

@@ -58,5 +58,26 @@ public class ListElement {
     public String toString() {
         return "Name: " + getName() + ", Address: " + getAddress();
     }
-}
 
+    /**
+     * Переопределение метода equals для сравнения элементов по имени и адресу.
+     * @param obj Объект для сравнения.
+     * @return true, если объекты равны по имени и адресу; иначе false.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        // Проверяем, что объект не является null и что это тот же класс
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        // Приводим объект к типу ListElement
+        ListElement other = (ListElement) obj;
+
+        // Сравниваем имена и адреса
+        return getName().equals(other.getName()) && getAddress().equals(other.getAddress());
+    }
+}

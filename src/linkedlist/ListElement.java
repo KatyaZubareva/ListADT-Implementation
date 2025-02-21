@@ -35,6 +35,58 @@ public class ListElement {
     }
 
     /**
+     * Метод для сравнения двух массивов символов.
+     * @param array1 Первый массив символов.
+     * @param array2 Второй массив символов.
+     * @return true, если массивы равны, иначе false.
+     */
+
+    private boolean compareArrays(char[] array1, char[] array2) {
+        // Если длины массивов разные, то они не равны
+        if (array1.length != array2.length) {
+            return false;
+        }
+
+        // Сравниваем элементы массивов по очереди
+        for (int i = 0; i < array1.length; i++) {
+            if (array1[i] != array2[i]) {
+                return false; // Если хотя бы один элемент не совпадает, массивы не равны
+            }
+        }
+
+        return true; // Массивы равны
+    }
+
+    /**
+     * Метод для сравнения текущего объекта ListElement с другим объектом.
+     * @param obj Объект, с которым нужно сравнить текущий.
+     * @return true, если объекты равны (имя и адрес совпадают), иначе false.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        // Проверка: сравнение объекта с самим собой
+        if (this == obj) {
+            return true; // Объекты равны
+        }
+
+        // Проверка: объект равен null или принадлежит другому классу
+        if (obj == null || getClass() != obj.getClass()) {
+            return false; // Объекты не равны
+        }
+
+        // Приведение объекта к типу ListElement
+        ListElement other = (ListElement) obj;
+
+        // Сравниваем массивы символов name
+        if (!compareArrays(this.name, other.name)) {
+            return false; // Имена не совпадают
+        }
+
+        // Сравниваем массивы символов address
+        return compareArrays(this.address, other.address); // Возвращаем результат сравнения адресов
+    }
+
+    /**
      * Метод для получения имени.
      * @return Строка, представляющая имя, обрезанное до 20 символов.
      */
