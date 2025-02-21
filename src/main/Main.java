@@ -1,6 +1,6 @@
 package main;
 
-import linkedlist.*; // Замените на linkedlist.* для работы со связным списком.
+import arraylist.*; // Замените на linkedlist.* для работы со связным списком.
 
 public class Main {
     public static void main(String[] args) {
